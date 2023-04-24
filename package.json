@@ -2,7 +2,7 @@
   "name": "telegram-api",
   "version": "1.0.0",
   "description": "Telegram API",
-  "main": "index.js",
+  "main": "./src/telegram.js",
   "scripts": {
     "test": "echo \"No test specified\"",
     "lint": "npx eslint '**/*.{js,ts}' --fix"

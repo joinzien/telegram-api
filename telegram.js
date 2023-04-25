@@ -11,7 +11,12 @@ class Telegram {
   }
 
   async parse(rawInput) {
-    return rawInput
+    const rawJson = JSON.parse(rawInput);
+
+    const user = rawJson.message.chat.id;
+    const message = rawJson.message.text;
+  
+    return { user, message };
   } 
   
   async addMenu(menuFile) {

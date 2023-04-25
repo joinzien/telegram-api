@@ -1,4 +1,4 @@
-// Copyright Zien X Ltd
+// SPDX-License-Identifier: MIT
 
 "use strict";
 

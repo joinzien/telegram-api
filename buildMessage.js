@@ -9,17 +9,26 @@ const buttonMarkupSeparator = "|";
 const buttonMarkupEnd = "]";
 
 const urlMarkup = "http";
+const linkMarkup = "<a href";
 
 function isMediaMessage(message) {
   const containsUrl = message.includes(urlMarkup);
 
-  return containsUrl
+  return containsUrl;
 }
 
 async function breakApartMedia(message) {
   const containsUrl = message.includes(urlMarkup);
 
   if (containsUrl !== true) {
+    const splitMessage = [message];
+    return splitMessage;
+  }
+
+  const urlCount = message.split(urlMarkup).length - 1;
+  const linkCount = message.split(linkMarkup).length - 1;
+
+  if (urlCount === linkCount) {
     const splitMessage = [message];
     return splitMessage;
   }

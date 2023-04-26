@@ -162,24 +162,24 @@ async function send(message, buttons, chatId, hideKeyboard, telegramToken) {
   if (buildMessage.isMediaMessage(message)) {
     // Send a media message
     const response = await sendMediaMessage(
-    message,
-    keyboard,
-    chatId, 
-    telegramToken
+      message,
+      keyboard,
+      chatId,
+      telegramToken
     );
 
-    return (response);
+    return response;
   } else {
     // Send a text message
     const response = await sendMessage(
-    message,
-    keyboard,
-    chatId, 
-    telegramToken
+      message,
+      keyboard,
+      chatId,
+      telegramToken
     );
 
-    return (response);
+    return response;
   }
 }
 
-module.exports = {send, buildMenu, sendPayload};
+module.exports = { send, buildMenu, sendPayload };

@@ -87,11 +87,14 @@ function buildMenu(menuFile) {
 
   for (const i in lines) {
     const items = lines[i].split(" - ");
-    const command = items[0];
-    const description = items[1];
 
-    const newCommand = { command, description };
-    menuitems.push(newCommand);
+    if (items.length === 2) {
+      const command = items[0];
+      const description = items[1];
+  
+      const newCommand = { command, description };
+      menuitems.push(newCommand);
+    }
   }
 
   const body = { commands: menuitems };

@@ -6,33 +6,15 @@ const fs = require("fs");
 
 const buildMessage = require("./buildMessage.js");
 
-function buildKeyboard(buttons, hideKeyboard) {
-  if (buttons.length <= 0) {
-    if (hideKeyboard) {
-      const keyboard = {
-        remove_keyboard: true,
-      };
-
-      return keyboard;
-    } else {
-      const keyboard = {};
-
-      return keyboard;
-    }
-  }
-
-  const buttonsRow = [];
+function buildKeyboard(buttons) {
+  const buttonRow = [];
 
   for (let i = 0; i < buttons.length; i++) {
-    buttonsRow.push(buttons[i]);
+    buttonRow.push({ text: buttons[i], callback_data: buttons[i] });
   }
 
-  const buttonGrid = [buttonsRow];
-
   const keyboard = {
-    keyboard: buttonGrid,
-    resize_keyboard: true,
-    one_time_keyboard: true,
+    inline_keyboard: [buttonRow],
   };
 
   return keyboard;
@@ -91,7 +73,7 @@ function buildMenu(menuFile) {
     if (items.length === 2) {
       const command = items[0];
       const description = items[1];
-  
+
       const newCommand = { command, description };
       menuitems.push(newCommand);
     }
@@ -159,8 +141,8 @@ async function sendMediaMessage(media, keyboard, chatId, telegramToken) {
   return sendPayload(body, endpoint, telegramToken);
 }
 
-async function send(message, buttons, chatId, hideKeyboard, telegramToken) {
-  const keyboard = buildKeyboard(buttons, hideKeyboard);
+async function send(message, buttons, chatId, telegramToken) {
+  const keyboard = buildKeyboard(buttons);
 
   if (buildMessage.isMediaMessage(message)) {
     // Send a media message

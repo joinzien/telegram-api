@@ -13,6 +13,13 @@ class Telegram {
   async parse(rawInput) {
     const rawJson = JSON.parse(rawInput);
 
+    if (Object.prototype.hasOwnProperty.call(rawJson, "callback_query")) {
+      const user = rawJson.callback_query.message.chat.id;
+      const message = rawJson.callback_query.data;
+
+      return { user, message };
+    }
+
     const user = rawJson.message.chat.id;
     const message = rawJson.message.text;
 
@@ -32,30 +39,17 @@ class Telegram {
       return "undefined response";
     }
 
-    const { reply, buttons } = await buildMessage.splitButtons(response);
-    const formattedReply = reply.replaceAll("<br/>", "\n");
+    const formattedReply = response.replaceAll("<br/>", "\n");
     const replyMessages = await buildMessage.splitReply(formattedReply);
 
     const responses = [];
 
     for (let i = 0; i < replyMessages.length; i++) {
-      const reply = replyMessages[i];
-
-      // We only want the buttons on the last mmessge of the batch
-      let currentButtons = [];
-      let lastMessage = false;
-      if (i === replyMessages.length - 1) {
-        currentButtons = buttons;
-        lastMessage = true;
-      }
-
-      const response = await message.send(
-        reply,
-        currentButtons,
-        chatId,
-        lastMessage,
-        this.token
+      const { reply, buttons } = await buildMessage.splitButtons(
+        replyMessages[i]
       );
+
+      const response = await message.send(reply, buttons, chatId, this.token);
       responses.push(response);
     }
 

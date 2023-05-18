@@ -89,6 +89,19 @@ async function splitReply(reply) {
   return replyMessages;
 }
 
+async function parseButton(rawButtonText) {
+  const buttonSeparator = rawButtonText.indexOf(buttonMarkupSeparator);
+  const buttonValues = rawButtonText.slice(buttonSeparator + 1);
+
+  const separator = buttonValues.indexOf(buttonMarkupSeparator);
+  const buttonEnd = buttonValues.indexOf(buttonMarkupEnd);
+
+  const buttonLabel = buttonValues.slice(0, separator);
+  const buttonAction = buttonValues.slice(separator + 1, buttonEnd);
+
+  return { label: buttonLabel, action: buttonAction };
+}
+
 async function splitButtons(response) {
   const buttons = [];
   let reply = "";
@@ -105,14 +118,12 @@ async function splitButtons(response) {
       reply = reply + frontOfString;
 
       const restOfString = content.slice(buttonStart);
-
       const buttonEnd = restOfString.indexOf(buttonMarkupEnd);
-      const rawButtonText = restOfString.slice(1, buttonEnd);
-      const buttonSeparator = rawButtonText.indexOf(buttonMarkupSeparator);
-      const buttonText = rawButtonText.slice(buttonSeparator + 1, buttonEnd);
-      buttons.push(buttonText);
-
       content = restOfString.slice(buttonEnd + 1);
+
+      const rawButtonText = restOfString.slice(0, buttonEnd + 1);
+      const button = await parseButton(rawButtonText);
+      buttons.push(button);
     }
   }
 

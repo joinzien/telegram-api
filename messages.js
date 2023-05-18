@@ -10,7 +10,8 @@ function buildKeyboard(buttons) {
   const buttonRow = [];
 
   for (let i = 0; i < buttons.length; i++) {
-    buttonRow.push({ text: buttons[i], callback_data: buttons[i] });
+    const button = buttons[i];
+    buttonRow.push({ text: button.label, callback_data: button.action });
   }
 
   const keyboard = {

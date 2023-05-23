@@ -84,7 +84,7 @@ async function splitReply(reply) {
   const pageSplits = reply.split(pageBreakMarkup);
 
   // Split out the media messages
-  const replyMessages = mediaSplitter(pageSplits);
+  const replyMessages = await mediaSplitter(pageSplits);
 
   return replyMessages;
 }

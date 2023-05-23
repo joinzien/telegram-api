@@ -142,13 +142,23 @@ async function sendMediaMessage(media, keyboard, chatId, telegramToken) {
   return sendPayload(body, endpoint, telegramToken);
 }
 
-async function send(message, buttons, chatId, telegramToken) {
+async function preProcess(response) {
+  const formattedReply = response.replaceAll("<br/>", "\n");
+  const replyMessages = await buildMessage.splitReply(formattedReply);  
+  
+  return replyMessages
+}
+
+async function send(message, chatId, telegramToken) {
+  const { reply, buttons } = await buildMessage.splitButtons(message);
   const keyboard = buildKeyboard(buttons);
 
-  if (buildMessage.isMediaMessage(message)) {
+  console.log(reply)
+
+  if (buildMessage.isMediaMessage(reply)) {
     // Send a media message
     const response = await sendMediaMessage(
-      message,
+      reply,
       keyboard,
       chatId,
       telegramToken
@@ -158,7 +168,7 @@ async function send(message, buttons, chatId, telegramToken) {
   } else {
     // Send a text message
     const response = await sendMessage(
-      message,
+      reply,
       keyboard,
       chatId,
       telegramToken
@@ -168,4 +178,4 @@ async function send(message, buttons, chatId, telegramToken) {
   }
 }
 
-module.exports = { send, buildMenu, sendPayload };
+module.exports = { send, buildMenu, preProcess, sendPayload };

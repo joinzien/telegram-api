@@ -3,7 +3,6 @@
 "use strict";
 
 const message = require("./messages.js");
-const buildMessage = require("./buildMessage.js");
 
 class Telegram {
   constructor(token) {
@@ -39,7 +38,7 @@ class Telegram {
       return "undefined response";
     }
 
-    const replyMessages = await message.preProcess(response)
+    const replyMessages = await message.preProcess(response);
 
     const responses = [];
 

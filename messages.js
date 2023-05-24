@@ -33,19 +33,21 @@ function buildTextMessage(message, keyboard, chatId) {
   return body;
 }
 
-function buildPhotoMessage(photo, keyboard, chatId) {
+function buildPhotoMessage(photo, caption, keyboard, chatId) {
   const body = {
     chat_id: chatId,
     reply_markup: keyboard,
+    caption,
     photo,
   };
 
   return body;
 }
 
-function buildAudioMessage(audio, keyboard, chatId) {
+function buildAudioMessage(audio, caption, keyboard, chatId) {
   const body = {
     chat_id: chatId,
+    caption,
     reply_markup: keyboard,
     audio,
   };
@@ -53,9 +55,10 @@ function buildAudioMessage(audio, keyboard, chatId) {
   return body;
 }
 
-function buildVideoMessage(video, keyboard, chatId) {
+function buildVideoMessage(video, caption, keyboard, chatId) {
   const body = {
     chat_id: chatId,
+    caption,
     reply_markup: keyboard,
     video,
   };
@@ -110,7 +113,16 @@ async function sendMessage(message, keyboard, chatId, telegramToken) {
   return sendPayload(body, endpoint, telegramToken);
 }
 
-async function sendMediaMessage(media, keyboard, chatId, telegramToken) {
+async function sendMediaMessage(message, keyboard, chatId, telegramToken) {
+  // Check if we have a caption
+  const replys = await buildMessage.mediaSplitter([message]);
+
+  const media = replys[0];
+  let caption = "";
+  if (replys.length > 1) {
+    caption = replys[1];
+  }
+
   const extension = media.split(".").pop().toLowerCase();
 
   let body = {};
@@ -119,22 +131,22 @@ async function sendMediaMessage(media, keyboard, chatId, telegramToken) {
   switch (extension) {
     case "png":
     case "jpg":
-      body = buildPhotoMessage(media, keyboard, chatId);
+      body = buildPhotoMessage(media, caption, keyboard, chatId);
       endpoint = "sendPhoto";
       break;
 
     case "mp4":
-      body = buildVideoMessage(media, keyboard, chatId);
+      body = buildVideoMessage(media, caption, keyboard, chatId);
       endpoint = "sendVideo";
       break;
 
     case "mp3":
-      body = buildAudioMessage(media, keyboard, chatId);
+      body = buildAudioMessage(media, caption, keyboard, chatId);
       endpoint = "sendAudio";
       break;
 
     default:
-      body = buildTextMessage(media, keyboard, chatId);
+      body = buildTextMessage(media, caption, keyboard, chatId);
       endpoint = "sendMessage";
       break;
   }
@@ -142,13 +154,21 @@ async function sendMediaMessage(media, keyboard, chatId, telegramToken) {
   return sendPayload(body, endpoint, telegramToken);
 }
 
-async function send(message, buttons, chatId, telegramToken) {
+async function preProcess(response) {
+  const formattedReply = response.replaceAll("<br/>", "\n");
+  const replyMessages = await buildMessage.splitReply(formattedReply);
+
+  return replyMessages;
+}
+
+async function send(message, chatId, telegramToken) {
+  const { reply, buttons } = await buildMessage.splitButtons(message);
   const keyboard = buildKeyboard(buttons);
 
-  if (buildMessage.isMediaMessage(message)) {
+  if (buildMessage.isMediaMessage(reply)) {
     // Send a media message
     const response = await sendMediaMessage(
-      message,
+      reply,
       keyboard,
       chatId,
       telegramToken
@@ -157,15 +177,10 @@ async function send(message, buttons, chatId, telegramToken) {
     return response;
   } else {
     // Send a text message
-    const response = await sendMessage(
-      message,
-      keyboard,
-      chatId,
-      telegramToken
-    );
+    const response = await sendMessage(reply, keyboard, chatId, telegramToken);
 
     return response;
   }
 }
 
-module.exports = { send, buildMenu, sendPayload };
+module.exports = { send, buildMenu, preProcess, sendPayload };

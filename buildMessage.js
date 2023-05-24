@@ -83,10 +83,7 @@ async function splitReply(reply) {
   // Split based on page breaks
   const pageSplits = reply.split(pageBreakMarkup);
 
-  // Split out the media messages
-  const replyMessages = mediaSplitter(pageSplits);
-
-  return replyMessages;
+  return pageSplits;
 }
 
 async function parseButton(rawButtonText) {
@@ -130,4 +127,4 @@ async function splitButtons(response) {
   return { reply, buttons };
 }
 
-module.exports = { isMediaMessage, splitReply, splitButtons };
+module.exports = { isMediaMessage, splitReply, splitButtons, mediaSplitter };

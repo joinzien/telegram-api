@@ -3,7 +3,6 @@
 "use strict";
 
 const message = require("./messages.js");
-const buildMessage = require("./buildMessage.js");
 
 class Telegram {
   constructor(token) {
@@ -39,17 +38,12 @@ class Telegram {
       return "undefined response";
     }
 
-    const formattedReply = response.replaceAll("<br/>", "\n");
-    const replyMessages = await buildMessage.splitReply(formattedReply);
+    const replyMessages = await message.preProcess(response);
 
     const responses = [];
 
     for (let i = 0; i < replyMessages.length; i++) {
-      const { reply, buttons } = await buildMessage.splitButtons(
-        replyMessages[i]
-      );
-
-      const response = await message.send(reply, buttons, chatId, this.token);
+      const response = await message.send(replyMessages[i], chatId, this.token);
       responses.push(response);
     }
 

@@ -8,6 +8,8 @@ const buttonMarkupStart = "[button|";
 const buttonMarkupSeparator = "|";
 const buttonMarkupEnd = "]";
 
+const separatorMarkup = "[row]";
+
 const urlMarkup = "http";
 const linkMarkup = "<a href";
 
@@ -105,12 +107,19 @@ async function splitButtons(response) {
 
   let content = response;
   while (content.length) {
+    const separatorStart = content.indexOf(separatorMarkup);
     const buttonStart = content.indexOf(buttonMarkupStart);
 
-    if (buttonStart === -1) {
-      reply = reply + content;
-      content = "";
-    } else {
+    const separatorFound = separatorStart !== -1 && separatorStart < buttonStart;
+    const buttonFound = buttonStart !== -1;
+
+    if (separatorFound) {
+      const separatorEnd = separatorStart + separatorMarkup.length;
+      content = content.slice(separatorEnd);
+
+      const row = { label: "row", action: "separator" };
+      buttons.push(row);
+    } else if (buttonFound) { 
       const frontOfString = content.slice(0, buttonStart);
       reply = reply + frontOfString;
 
@@ -121,6 +130,9 @@ async function splitButtons(response) {
       const rawButtonText = restOfString.slice(0, buttonEnd + 1);
       const button = await parseButton(rawButtonText);
       buttons.push(button);
+    } else {
+      reply = reply + content;
+      content = "";
     }
   }
 

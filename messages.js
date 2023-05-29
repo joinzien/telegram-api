@@ -7,15 +7,25 @@ const fs = require("fs");
 const buildMessage = require("./buildMessage.js");
 
 function buildKeyboard(buttons) {
-  const buttonRow = [];
-
+  const buttonGrid = [];
+  let buttonRow = [];
   for (let i = 0; i < buttons.length; i++) {
     const button = buttons[i];
-    buttonRow.push({ text: button.label, callback_data: button.action });
+
+    if ((button.label === "row") && (button.action === "separator")) {
+      buttonGrid.push(buttonRow);
+      buttonRow = [];
+    } else {
+      buttonRow.push({ text: button.label, callback_data: button.action });
+    }
   }
 
+  if (buttonRow.length > 0) {
+    buttonGrid.push(buttonRow);
+  }
+  
   const keyboard = {
-    inline_keyboard: [buttonRow],
+    inline_keyboard: buttonGrid,
   };
 
   return keyboard;

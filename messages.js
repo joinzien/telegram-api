@@ -175,9 +175,6 @@ async function send(message, chatId, telegramToken) {
   const { reply, buttons } = buildMessage.splitButtons(message);
   const keyboard = buildKeyboard(buttons);
 
-  console.log(`Sending message: ${reply}`);
-  console.log(`Sending buttons: ${JSON.stringify(keyboard)}`);
-
   if (reply.length === 0) { return "No message body"; }
 
   if (buildMessage.isMediaMessage(reply)) {

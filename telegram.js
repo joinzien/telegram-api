@@ -38,7 +38,7 @@ class Telegram {
       return "undefined response";
     }
 
-    const replyMessages = await message.preProcess(response);
+    const replyMessages = message.preProcess(response);
 
     const responses = [];
 

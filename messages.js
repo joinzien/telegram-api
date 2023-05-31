@@ -113,7 +113,7 @@ async function sendPayload(body, endpoint, telegramToken) {
   const fullUrl = `${baseUrl}${telegramToken}/${endpoint}`;
   const config = buildConfig();
 
-  return await axios.post(fullUrl, body, config);
+  return axios.post(fullUrl, body, config);
 }
 
 async function sendMessage(message, keyboard, chatId, telegramToken) {
@@ -125,7 +125,7 @@ async function sendMessage(message, keyboard, chatId, telegramToken) {
 
 async function sendMediaMessage(message, keyboard, chatId, telegramToken) {
   // Check if we have a caption
-  const replys = await buildMessage.mediaSplitter([message]);
+  const replys = buildMessage.mediaSplitter([message]);
 
   const media = replys[0];
   let caption = "";
@@ -164,15 +164,15 @@ async function sendMediaMessage(message, keyboard, chatId, telegramToken) {
   return sendPayload(body, endpoint, telegramToken);
 }
 
-async function preProcess(response) {
+function preProcess(response) {
   const formattedReply = response.replaceAll("<br/>", "\n");
-  const replyMessages = await buildMessage.splitReply(formattedReply);
+  const replyMessages = buildMessage.splitReply(formattedReply);
 
   return replyMessages;
 }
 
 async function send(message, chatId, telegramToken) {
-  const { reply, buttons } = await buildMessage.splitButtons(message);
+  const { reply, buttons } = buildMessage.splitButtons(message);
   const keyboard = buildKeyboard(buttons);
 
   if (reply.length === 0) { return "No message body"; }

@@ -19,7 +19,7 @@ function isMediaMessage(message) {
   return containsUrl;
 }
 
-async function breakApartMedia(message) {
+function breakApartMedia(message) {
   const containsUrl = message.includes(urlMarkup);
 
   if (containsUrl !== true) {
@@ -64,13 +64,13 @@ async function breakApartMedia(message) {
   return splitMessage;
 }
 
-async function mediaSplitter(responses) {
+function mediaSplitter(responses) {
   const replyMessages = [];
 
   for (let i = 0; i < responses.length; i++) {
     const message = responses[i];
 
-    const splitMessage = await breakApartMedia(message);
+    const splitMessage = breakApartMedia(message);
 
     for (let i = 0; i < splitMessage.length; i++) {
       const reply = splitMessage[i];
@@ -81,14 +81,14 @@ async function mediaSplitter(responses) {
   return replyMessages;
 }
 
-async function splitReply(reply) {
+function splitReply(reply) {
   // Split based on page breaks
   const pageSplits = reply.split(pageBreakMarkup);
 
   return pageSplits;
 }
 
-async function parseButton(rawButtonText) {
+function parseButton(rawButtonText) {
   const buttonSeparator = rawButtonText.indexOf(buttonMarkupSeparator);
   const buttonValues = rawButtonText.slice(buttonSeparator + 1);
 
@@ -101,7 +101,7 @@ async function parseButton(rawButtonText) {
   return { label: buttonLabel, action: buttonAction };
 }
 
-async function splitButtons(response) {
+function splitButtons(response) {
   const buttons = [];
   let reply = "";
 
@@ -133,7 +133,7 @@ async function splitButtons(response) {
       content = restOfString.slice(buttonEnd + 1);
 
       const rawButtonText = restOfString.slice(0, buttonEnd + 1);
-      const button = await parseButton(rawButtonText);
+      const button = parseButton(rawButtonText);
       buttons.push(button);
     } else {
       reply = reply + content;

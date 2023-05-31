@@ -110,7 +110,12 @@ async function splitButtons(response) {
     const separatorStart = content.indexOf(separatorMarkup);
     const buttonStart = content.indexOf(buttonMarkupStart);
 
-    const separatorFound = separatorStart !== -1 && separatorStart < buttonStart;
+    const bothFound =
+      separatorStart !== -1 &&
+      buttonStart !== -1 &&
+      separatorStart < buttonStart;
+    const onlySeparatorFound = separatorStart !== -1 && buttonStart === -1;
+    const separatorFound = bothFound || onlySeparatorFound;
     const buttonFound = buttonStart !== -1;
 
     if (separatorFound) {
@@ -119,7 +124,7 @@ async function splitButtons(response) {
 
       const row = { label: "row", action: "separator" };
       buttons.push(row);
-    } else if (buttonFound) { 
+    } else if (buttonFound) {
       const frontOfString = content.slice(0, buttonStart);
       reply = reply + frontOfString;
 

@@ -12,7 +12,7 @@ function buildKeyboard(buttons) {
   for (let i = 0; i < buttons.length; i++) {
     const button = buttons[i];
 
-    if ((button.label === "row") && (button.action === "separator")) {
+    if (button.label === "row" && button.action === "separator") {
       buttonGrid.push(buttonRow);
       buttonRow = [];
     } else {
@@ -23,7 +23,7 @@ function buildKeyboard(buttons) {
   if (buttonRow.length > 0) {
     buttonGrid.push(buttonRow);
   }
-  
+
   const keyboard = {
     inline_keyboard: buttonGrid,
   };
@@ -174,6 +174,8 @@ async function preProcess(response) {
 async function send(message, chatId, telegramToken) {
   const { reply, buttons } = await buildMessage.splitButtons(message);
   const keyboard = buildKeyboard(buttons);
+
+  if (reply.length === 0) { return "No message body"; }
 
   if (buildMessage.isMediaMessage(reply)) {
     // Send a media message

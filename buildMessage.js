@@ -14,9 +14,20 @@ const urlMarkup = "http";
 const linkMarkup = "<a href";
 
 function isMediaMessage(message) {
-  const containsUrl = message.includes(urlMarkup);
+  const urlCount = message.split(urlMarkup).length - 1;
+  const linkCount = message.split(linkMarkup).length - 1;
+  const mediaUrlCount = urlCount - linkCount 
 
-  return containsUrl;
+  if (urlCount === 0) {
+    // No URLs
+    return false;
+  } else if (mediaUrlCount > 0) {
+    // At least one more URL than links, so this is a media message
+    return true;
+  }
+
+  // The same number of URLs and links, so they are all links
+  return false
 }
 
 function breakApartMedia(message) {

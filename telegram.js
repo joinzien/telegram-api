@@ -37,17 +37,22 @@ class Telegram {
     if (response === undefined) {
       return "undefined response";
     }
-
     const replyMessages = message.preProcess(response);
 
-    const responses = [];
+    const messageIDs = [];
 
     for (let i = 0; i < replyMessages.length; i++) {
       const response = await message.send(replyMessages[i], chatId, this.token);
-      responses.push(response);
+
+      if (response.status === 200) {
+        const messageID = response.data.result.message_id;
+        messageIDs.push(messageID);
+      }
     }
 
-    return responses;
+    const messageIDsString = messageIDs.join(", ");
+    const result = {messageName: "", messageIDs: messageIDsString}
+    return result;
   }
 }
 

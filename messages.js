@@ -6,6 +6,14 @@ const fs = require("fs");
 
 const buildMessage = require("./buildMessage.js");
 
+const messageMarkupStart = "[message|";
+const messageMarkupSeparator = "|";
+const messageMarkupEnd = "]";
+
+const refreshMarkupStart = "[refresh|";
+const refreshMarkupSeparator = "|";
+const refreshMarkupEnd = "]";
+
 function buildKeyboard(buttons) {
   const buttonGrid = [];
   let buttonRow = [];
@@ -120,7 +128,7 @@ async function sendMessage(message, keyboard, chatId, telegramToken) {
   const body = buildTextMessage(message, keyboard, chatId);
   const endpoint = "sendMessage";
 
-  return sendPayload(body, endpoint, telegramToken);
+  return sendPayload(body, endpoint, telegramToken); 
 }
 
 async function sendMediaMessage(message, keyboard, chatId, telegramToken) {
@@ -164,8 +172,36 @@ async function sendMediaMessage(message, keyboard, chatId, telegramToken) {
   return sendPayload(body, endpoint, telegramToken);
 }
 
+function removeTag(message, tagStart, tagEnd) {
+  const separatorStart = message.indexOf(tagStart);
+
+  if (separatorStart !== -1) {
+    const startOfMessage = message.slice(0, separatorStart);  
+
+    const separatorMid = separatorStart + tagStart.length;
+    const restOfMessage = content.slice(separatorMid);
+    const separatorEnd = restOfMessage.indexOf(tagEnd);
+    const endOfMessage = restOfMessage.slice(separatorEnd);
+
+    const filteredMessage = startOfMessage + endOfMessage;
+
+    console.log(startOfMessage);
+    console.log(endOfMessage);
+    console.log(filteredMessage);
+
+    //return filteredMessage;
+  }
+  
+  console.log(message);
+
+  return message;
+}
+
 function preProcess(response) {
-  const formattedReply = response.replaceAll("<br/>", "\n");
+  const noMessageTag = removeTag(response, messageMarkupStart, messageMarkupEnd);
+  const noRefreshTag = removeTag(noMessageTag, refreshMarkupStart, refreshMarkupEnd);
+  
+  const formattedReply = noRefreshTag.replaceAll("<br/>", "\n");
   const replyMessages = buildMessage.splitReply(formattedReply);
 
   return replyMessages;

@@ -128,7 +128,7 @@ async function sendMessage(message, keyboard, chatId, telegramToken) {
   const body = buildTextMessage(message, keyboard, chatId);
   const endpoint = "sendMessage";
 
-  return sendPayload(body, endpoint, telegramToken); 
+  return sendPayload(body, endpoint, telegramToken);
 }
 
 async function sendMediaMessage(message, keyboard, chatId, telegramToken) {
@@ -176,31 +176,32 @@ function removeTag(message, tagStart, tagEnd) {
   const separatorStart = message.indexOf(tagStart);
 
   if (separatorStart !== -1) {
-    const startOfMessage = message.slice(0, separatorStart);  
+    const startOfMessage = message.slice(0, separatorStart);
 
     const separatorMid = separatorStart + tagStart.length;
-    const restOfMessage = content.slice(separatorMid);
+    const restOfMessage = message.slice(separatorMid);
     const separatorEnd = restOfMessage.indexOf(tagEnd);
-    const endOfMessage = restOfMessage.slice(separatorEnd);
+    const endOfMessage = restOfMessage.slice(separatorEnd + 1);
 
     const filteredMessage = startOfMessage + endOfMessage;
-
-    console.log(startOfMessage);
-    console.log(endOfMessage);
-    console.log(filteredMessage);
-
-    //return filteredMessage;
+    return filteredMessage;
   }
-  
-  console.log(message);
 
   return message;
 }
 
 function preProcess(response) {
-  const noMessageTag = removeTag(response, messageMarkupStart, messageMarkupEnd);
-  const noRefreshTag = removeTag(noMessageTag, refreshMarkupStart, refreshMarkupEnd);
-  
+  const noMessageTag = removeTag(
+    response,
+    messageMarkupStart,
+    messageMarkupEnd
+  );
+  const noRefreshTag = removeTag(
+    noMessageTag,
+    refreshMarkupStart,
+    refreshMarkupEnd
+  );
+
   const formattedReply = noRefreshTag.replaceAll("<br/>", "\n");
   const replyMessages = buildMessage.splitReply(formattedReply);
 
@@ -211,7 +212,9 @@ async function send(message, chatId, telegramToken) {
   const { reply, buttons } = buildMessage.splitButtons(message);
   const keyboard = buildKeyboard(buttons);
 
-  if (reply.length === 0) { return "No message body"; }
+  if (reply.length === 0) {
+    return "No message body";
+  }
 
   if (buildMessage.isMediaMessage(reply)) {
     // Send a media message

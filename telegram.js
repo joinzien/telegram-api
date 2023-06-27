@@ -51,7 +51,7 @@ class Telegram {
     }
 
     const messageIDsString = messageIDs.join(", ");
-    const result = {messageName: "", messageIDs: messageIDsString}
+    const result = { messageName: "", messageIDs: messageIDsString };
     return result;
   }
 }

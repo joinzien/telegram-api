@@ -7,11 +7,9 @@ const fs = require("fs");
 const buildMessage = require("./buildMessage.js");
 
 const messageMarkupStart = "[message|";
-const messageMarkupSeparator = "|";
 const messageMarkupEnd = "]";
 
 const refreshMarkupStart = "[refresh|";
-const refreshMarkupSeparator = "|";
 const refreshMarkupEnd = "]";
 
 function buildKeyboard(buttons) {

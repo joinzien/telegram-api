@@ -16,7 +16,7 @@ const linkMarkup = "<a href";
 function isMediaMessage(message) {
   const urlCount = message.split(urlMarkup).length - 1;
   const linkCount = message.split(linkMarkup).length - 1;
-  const mediaUrlCount = urlCount - linkCount 
+  const mediaUrlCount = urlCount - linkCount;
 
   if (urlCount === 0) {
     // No URLs
@@ -27,7 +27,7 @@ function isMediaMessage(message) {
   }
 
   // The same number of URLs and links, so they are all links
-  return false
+  return false;
 }
 
 function breakApartMedia(message) {

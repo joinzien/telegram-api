@@ -6,6 +6,12 @@ const fs = require("fs");
 
 const buildMessage = require("./buildMessage.js");
 
+const messageMarkupStart = "[message|";
+const messageMarkupEnd = "]";
+
+const refreshMarkupStart = "[refresh|";
+const refreshMarkupEnd = "]";
+
 function buildKeyboard(buttons) {
   const buttonGrid = [];
   let buttonRow = [];
@@ -164,8 +170,37 @@ async function sendMediaMessage(message, keyboard, chatId, telegramToken) {
   return sendPayload(body, endpoint, telegramToken);
 }
 
+function removeTag(message, tagStart, tagEnd) {
+  const separatorStart = message.indexOf(tagStart);
+
+  if (separatorStart !== -1) {
+    const startOfMessage = message.slice(0, separatorStart);
+
+    const separatorMid = separatorStart + tagStart.length;
+    const restOfMessage = message.slice(separatorMid);
+    const separatorEnd = restOfMessage.indexOf(tagEnd);
+    const endOfMessage = restOfMessage.slice(separatorEnd + 1);
+
+    const filteredMessage = startOfMessage + endOfMessage;
+    return filteredMessage;
+  }
+
+  return message;
+}
+
 function preProcess(response) {
-  const formattedReply = response.replaceAll("<br/>", "\n");
+  const noMessageTag = removeTag(
+    response,
+    messageMarkupStart,
+    messageMarkupEnd
+  );
+  const noRefreshTag = removeTag(
+    noMessageTag,
+    refreshMarkupStart,
+    refreshMarkupEnd
+  );
+
+  const formattedReply = noRefreshTag.replaceAll("<br/>", "\n");
   const replyMessages = buildMessage.splitReply(formattedReply);
 
   return replyMessages;
@@ -175,7 +210,9 @@ async function send(message, chatId, telegramToken) {
   const { reply, buttons } = buildMessage.splitButtons(message);
   const keyboard = buildKeyboard(buttons);
 
-  if (reply.length === 0) { return "No message body"; }
+  if (reply.length === 0) {
+    return "No message body";
+  }
 
   if (buildMessage.isMediaMessage(reply)) {
     // Send a media message

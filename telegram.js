@@ -2,7 +2,9 @@
 
 "use strict";
 
-const message = require("./messages.js");
+const message = require("./send.js");
+const edit = require("./edit.js");
+const buildMessage = require("./build.js");
 
 class Telegram {
   constructor(token) {
@@ -30,7 +32,23 @@ class Telegram {
 
     const body = message.buildMenu(menuFile);
 
-    return message.sendPayload(body, endpoint, this.token);
+    return buildMessage.sendPayload(body, endpoint, this.token);
+  }
+
+  containsRefresh(reply) {
+    return message.doesReplyContainsTag(
+      reply,
+      message.refreshMarkupStart,
+      message.refreshMarkupEnd
+    );
+  }
+
+  refreshName(reply) {
+    return message.extractName(
+      reply,
+      message.refreshMarkupStart,
+      message.refreshMarkupEnd
+    );
   }
 
   async send(chatId, response) {
@@ -50,8 +68,33 @@ class Telegram {
       }
     }
 
+    // Set the message ID and name
+    let stateName = "";
+    if (message.doesReplyContainsTag(response, message.messageMarkupStart)) {
+      stateName = message.extractName(
+        response,
+        message.messageMarkupStart,
+        message.messageMarkupEnd
+      );
+    }
+
     const messageIDsString = messageIDs.join(", ");
-    const result = { messageName: "", messageIDs: messageIDsString };
+    const result = { name: stateName, value: messageIDsString };
+
+    return result;
+  }
+
+  async edit(chatId, messageId, response) {
+    if (response === undefined) {
+      return "undefined response";
+    }
+    const replyMessages = message.preProcess(response);
+
+    for (let i = 0; i < replyMessages.length; i++) {
+      await edit.send(replyMessages[i], chatId, messageId, this.token);
+    }
+
+    const result = { name: "", value: messageId };
     return result;
   }
 }

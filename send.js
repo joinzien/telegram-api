@@ -1,41 +1,15 @@
 // SPDX-License-Identifier: MIT
 
 "use strict";
-const axios = require("axios");
 const fs = require("fs");
 
-const buildMessage = require("./buildMessage.js");
+const buildMessage = require("./build.js");
 
 const messageMarkupStart = "[message|";
 const messageMarkupEnd = "]";
 
 const refreshMarkupStart = "[refresh|";
 const refreshMarkupEnd = "]";
-
-function buildKeyboard(buttons) {
-  const buttonGrid = [];
-  let buttonRow = [];
-  for (let i = 0; i < buttons.length; i++) {
-    const button = buttons[i];
-
-    if (button.label === "row" && button.action === "separator") {
-      buttonGrid.push(buttonRow);
-      buttonRow = [];
-    } else {
-      buttonRow.push({ text: button.label, callback_data: button.action });
-    }
-  }
-
-  if (buttonRow.length > 0) {
-    buttonGrid.push(buttonRow);
-  }
-
-  const keyboard = {
-    inline_keyboard: buttonGrid,
-  };
-
-  return keyboard;
-}
 
 function buildTextMessage(message, keyboard, chatId) {
   const body = {
@@ -104,29 +78,11 @@ function buildMenu(menuFile) {
   return body;
 }
 
-function buildConfig() {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  };
-
-  return config;
-}
-
-async function sendPayload(body, endpoint, telegramToken) {
-  const baseUrl = "https://api.telegram.org/bot";
-  const fullUrl = `${baseUrl}${telegramToken}/${endpoint}`;
-  const config = buildConfig();
-
-  return axios.post(fullUrl, body, config);
-}
-
 async function sendMessage(message, keyboard, chatId, telegramToken) {
   const body = buildTextMessage(message, keyboard, chatId);
   const endpoint = "sendMessage";
 
-  return sendPayload(body, endpoint, telegramToken);
+  return buildMessage.sendPayload(body, endpoint, telegramToken);
 }
 
 async function sendMediaMessage(message, keyboard, chatId, telegramToken) {
@@ -167,7 +123,7 @@ async function sendMediaMessage(message, keyboard, chatId, telegramToken) {
       break;
   }
 
-  return sendPayload(body, endpoint, telegramToken);
+  return buildMessage.sendPayload(body, endpoint, telegramToken);
 }
 
 function removeTag(message, tagStart, tagEnd) {
@@ -186,6 +142,20 @@ function removeTag(message, tagStart, tagEnd) {
   }
 
   return message;
+}
+
+function doesReplyContainsTag(reply, tagStart) {
+  const separatorStart = reply.indexOf(tagStart);
+
+  return separatorStart !== -1;
+}
+
+function extractName(reply, tagStart, tagEnd) {
+  const nameStart = reply.indexOf(tagStart) + tagStart.length;
+  const nameEnd = reply.indexOf(tagEnd);
+  const stateName = reply.substring(nameStart, nameEnd);
+
+  return stateName;
 }
 
 function preProcess(response) {
@@ -208,7 +178,7 @@ function preProcess(response) {
 
 async function send(message, chatId, telegramToken) {
   const { reply, buttons } = buildMessage.splitButtons(message);
-  const keyboard = buildKeyboard(buttons);
+  const keyboard = buildMessage.buildKeyboard(buttons);
 
   if (reply.length === 0) {
     return "No message body";
@@ -232,4 +202,14 @@ async function send(message, chatId, telegramToken) {
   }
 }
 
-module.exports = { send, buildMenu, preProcess, sendPayload };
+module.exports = {
+  send,
+  buildMenu,
+  preProcess,
+  doesReplyContainsTag,
+  extractName,
+  messageMarkupStart,
+  messageMarkupEnd,
+  refreshMarkupStart,
+  refreshMarkupEnd,
+};

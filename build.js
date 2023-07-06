@@ -2,6 +2,8 @@
 
 "use strict";
 
+const axios = require("axios");
+
 const pageBreakMarkup = "[pagebreak]";
 
 const buttonMarkupStart = "[button|";
@@ -155,4 +157,54 @@ function splitButtons(response) {
   return { reply, buttons };
 }
 
-module.exports = { isMediaMessage, splitReply, splitButtons, mediaSplitter };
+function buildKeyboard(buttons) {
+  const buttonGrid = [];
+  let buttonRow = [];
+  for (let i = 0; i < buttons.length; i++) {
+    const button = buttons[i];
+
+    if (button.label === "row" && button.action === "separator") {
+      buttonGrid.push(buttonRow);
+      buttonRow = [];
+    } else {
+      buttonRow.push({ text: button.label, callback_data: button.action });
+    }
+  }
+
+  if (buttonRow.length > 0) {
+    buttonGrid.push(buttonRow);
+  }
+
+  const keyboard = {
+    inline_keyboard: buttonGrid,
+  };
+
+  return keyboard;
+}
+
+function buildConfig() {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  return config;
+}
+
+async function sendPayload(body, endpoint, telegramToken) {
+  const baseUrl = "https://api.telegram.org/bot";
+  const fullUrl = `${baseUrl}${telegramToken}/${endpoint}`;
+  const config = buildConfig();
+
+  return axios.post(fullUrl, body, config);
+}
+
+module.exports = {
+  isMediaMessage,
+  splitReply,
+  splitButtons,
+  mediaSplitter,
+  buildKeyboard,
+  sendPayload,
+};

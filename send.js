@@ -162,12 +162,12 @@ function preProcess(response) {
   const noMessageTag = removeTag(
     response,
     messageMarkupStart,
-    messageMarkupEnd
+    messageMarkupEnd,
   );
   const noRefreshTag = removeTag(
     noMessageTag,
     refreshMarkupStart,
-    refreshMarkupEnd
+    refreshMarkupEnd,
   );
 
   const formattedReply = noRefreshTag.replaceAll("<br/>", "\n");
@@ -190,7 +190,7 @@ async function send(message, chatId, telegramToken) {
       reply,
       keyboard,
       chatId,
-      telegramToken
+      telegramToken,
     );
 
     return response;

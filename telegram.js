@@ -39,7 +39,7 @@ class Telegram {
     return message.doesReplyContainsTag(
       reply,
       message.refreshMarkupStart,
-      message.refreshMarkupEnd
+      message.refreshMarkupEnd,
     );
   }
 
@@ -47,7 +47,7 @@ class Telegram {
     return message.extractName(
       reply,
       message.refreshMarkupStart,
-      message.refreshMarkupEnd
+      message.refreshMarkupEnd,
     );
   }
 
@@ -74,7 +74,7 @@ class Telegram {
       stateName = message.extractName(
         response,
         message.messageMarkupStart,
-        message.messageMarkupEnd
+        message.messageMarkupEnd,
       );
     }
 

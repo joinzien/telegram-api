@@ -58,7 +58,7 @@ async function editMessage(
   keyboard,
   chatId,
   messageId,
-  telegramToken
+  telegramToken,
 ) {
   const body = buildTextMessage(message, keyboard, chatId, messageId);
   const endpoint = "editMessageText";
@@ -71,7 +71,7 @@ async function editMediaMessage(
   keyboard,
   chatId,
   messageId,
-  telegramToken
+  telegramToken,
 ) {
   // Check if we have a caption
   const replys = buildMessage.mediaSplitter([message]);
@@ -128,7 +128,7 @@ async function send(message, chatId, messageId, telegramToken) {
       keyboard,
       chatId,
       messageId,
-      telegramToken
+      telegramToken,
     );
 
     return response;
@@ -139,7 +139,7 @@ async function send(message, chatId, messageId, telegramToken) {
       keyboard,
       chatId,
       messageId,
-      telegramToken
+      telegramToken,
     );
 
     return response;

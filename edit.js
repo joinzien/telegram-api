@@ -4,50 +4,34 @@
 
 const buildMessage = require("./build.js");
 
+const parseMode = "HTML";
+
 function buildTextMessage(message, keyboard, chatId, messageId) {
   const body = {
     chat_id: chatId,
     message_id: messageId,
     text: message,
     reply_markup: keyboard,
-    parse_mode: "HTML",
+    parse_mode: parseMode,
     disable_web_page_preview: true,
   };
 
   return body;
 }
 
-function buildPhotoMessage(photo, caption, keyboard, chatId, messageId) {
-  const body = {
-    chat_id: chatId,
-    message_id: messageId,
-    reply_markup: keyboard,
+function buildMediaMessage(type, media, caption, keyboard, chatId, messageId) {
+  const mediaPayload = {
+    type,
+    media,
     caption,
-    photo,
   };
 
-  return body;
-}
-
-function buildAudioMessage(audio, caption, keyboard, chatId, messageId) {
   const body = {
     chat_id: chatId,
     message_id: messageId,
-    caption,
+    media: mediaPayload,
     reply_markup: keyboard,
-    audio,
-  };
-
-  return body;
-}
-
-function buildVideoMessage(video, caption, keyboard, chatId, messageId) {
-  const body = {
-    chat_id: chatId,
-    message_id: messageId,
-    caption,
-    reply_markup: keyboard,
-    video,
+    parse_mode: parseMode,
   };
 
   return body;
@@ -85,28 +69,45 @@ async function editMediaMessage(
   const extension = media.split(".").pop().toLowerCase();
 
   let body = {};
-  let endpoint = "editMessageText";
+  const endpoint = "editMessageMedia";
 
   switch (extension) {
     case "png":
     case "jpg":
-      body = buildPhotoMessage(media, caption, keyboard, chatId, messageId);
-      endpoint = "editMessageText";
+      body = buildMediaMessage(
+        "photo",
+        media,
+        caption,
+        keyboard,
+        chatId,
+        messageId,
+      );
       break;
 
     case "mp4":
-      body = buildVideoMessage(media, caption, keyboard, chatId, messageId);
-      endpoint = "editMessageText";
+      body = buildMediaMessage(
+        "video",
+        media,
+        caption,
+        keyboard,
+        chatId,
+        messageId,
+      );
       break;
 
     case "mp3":
-      body = buildAudioMessage(media, caption, keyboard, chatId, messageId);
-      endpoint = "editMessageText";
+      body = buildMediaMessage(
+        "audio",
+        media,
+        caption,
+        keyboard,
+        chatId,
+        messageId,
+      );
       break;
 
     default:
       body = buildTextMessage(media, caption, keyboard, chatId, messageId);
-      endpoint = "editMessageText";
       break;
   }
 

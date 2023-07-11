@@ -11,12 +11,14 @@ const messageMarkupEnd = "]";
 const refreshMarkupStart = "[refresh|";
 const refreshMarkupEnd = "]";
 
+const parseMode = "HTML";
+
 function buildTextMessage(message, keyboard, chatId) {
   const body = {
     chat_id: chatId,
     text: message,
     reply_markup: keyboard,
-    parse_mode: "HTML",
+    parse_mode: parseMode,
     disable_web_page_preview: true,
   };
 
@@ -29,6 +31,7 @@ function buildPhotoMessage(photo, caption, keyboard, chatId) {
     reply_markup: keyboard,
     caption,
     photo,
+    parse_mode: parseMode,
   };
 
   return body;
@@ -40,6 +43,7 @@ function buildAudioMessage(audio, caption, keyboard, chatId) {
     caption,
     reply_markup: keyboard,
     audio,
+    parse_mode: parseMode,
   };
 
   return body;
@@ -51,6 +55,7 @@ function buildVideoMessage(video, caption, keyboard, chatId) {
     caption,
     reply_markup: keyboard,
     video,
+    parse_mode: parseMode,
   };
 
   return body;

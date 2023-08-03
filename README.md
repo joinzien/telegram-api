@@ -5,7 +5,7 @@ A simple API for interacting with Telegram chats.
 
 - <br/> Line break
 - [pagebreak] Allow multi-message responses
-- [button|text] Add a quick reply button
+- [button|label|action]  Add a quick reply button
 - Links/Media Just include the URL
 - S3 set MP3s to `audio/mp3`, WhatsApp accepted `audio/mpeg`, so you will need to manually set the filetype. 
 - <strong>bold</strong>
